@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import classes from'./App.css';
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockpit/Cockpit';
+import AuthContext from '../context/auth-context'
 
 class App extends Component {
   state = {
@@ -12,6 +13,7 @@ class App extends Component {
       { id: '3', name: 'Bip', age: 19, }
     ],
     showPersons: false,
+    authenticated: false,
   }
 
   togglePersonsHandler = () => {
@@ -37,6 +39,12 @@ class App extends Component {
     });
   }
 
+  loginHandler = () => {
+    this.setState({
+      authenticated: true
+    });
+  }
+
   render() {
     let persons = null;
 
@@ -50,13 +58,18 @@ class App extends Component {
 
     return (
       <div className={classes.App}>
-        <Cockpit
-          title={this.props.appTitle}
-          showPersons={this.state.showPersons}
-          personsLength={this.state.persons.length}
-          clicked={this.togglePersonsHandler}
-        />
-        { persons }
+        <AuthContext.Provider value={{
+          authenticated: this.state.authenticated,
+          login: this.loginHandler}}
+          >
+          <Cockpit
+            title={this.props.appTitle}
+            showPersons={this.state.showPersons}
+            personsLength={this.state.persons.length}
+            clicked={this.togglePersonsHandler}
+          />
+          { persons }
+        </AuthContext.Provider>
       </div>
     );
   }

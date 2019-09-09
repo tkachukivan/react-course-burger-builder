@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
+import AuthContext from '../../context/auth-context';
 
 import classes from './Cockpit.css';
 
@@ -6,6 +7,8 @@ const Cockpit = (props) => {
   useEffect(() => {
     console.log('Cockpit use effect')
   }, [])
+
+  const authContext = useContext(AuthContext);
 
   const assignedClasses = [];
   let btnClass = '';
@@ -29,6 +32,7 @@ const Cockpit = (props) => {
       <button className={btnClass} onClick={props.clicked}>
         Switch name
       </button>
+      <button onClick={authContext.login}>Log in</button>
     </div>
   )
 }
