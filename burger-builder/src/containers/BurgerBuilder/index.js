@@ -72,32 +72,15 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        this.setState({
-            loading: true,
-        });
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice,
-            customer: {
-                name: 'Max',
-                address: {
-                    street: 'Test 1',
-                    zipCode: '12344',
-                    country: 'Poland',
-                },
-                email: 'test@test.com'
-            },
-            deliveryMethod: 'fastest'
-        };
+        const queryParams = Object.keys(this.state.ingredients)
+                                    .map((key) => encodeURI(`${key}=${this.state.ingredients[key]}`));
 
-        axios.post('/orders.json', order)
-            .catch(error => {})
-            .finally(() => {
-                this.setState({
-                    loading: false,
-                    purchasing: false
-                });
-            });
+        queryParams.push(encodeURI(`price=${this.state.totalPrice}`))
+
+        this.props.history.push({
+            pathname: '/checkout',
+            search: `?${queryParams.join('&')}`
+        });
     }
 
     componentDidMount() {
@@ -123,18 +106,16 @@ class BurgerBuilder extends Component {
     }
 
     render() {
-        const disableInfo = {
-            ...this.state.ingredients,
-        }
-
-        for (let key in disableInfo) {
-            disableInfo[key] = disableInfo[key] <= 0;
-        }
-
         let orderSummary = null;
         let burger = this.state.error ? <Spinner /> : <p>Ingredients can't be loaded</p>;
 
         if (this.state.ingredients) {
+            const disableInfo = Object.keys(this.state.ingredients)
+                                    .reduce((acc, key) => {
+                                        acc[key] = this.state.ingredients[key] <=0;
+                                        return acc;
+                                    }, {});
+
             burger = (
                 <React.Fragment>
                     <Burger ingredients={this.state.ingredients}/>
@@ -155,10 +136,6 @@ class BurgerBuilder extends Component {
                                 purchaseCanselled={this.purchaseCancelHandler}
                                 purchaseContinued={this.purchaseContinueHandler}
                             />;
-        }
-
-        if (this.state.loading) {
-            orderSummary = <Spinner />
         }
 
         return (
