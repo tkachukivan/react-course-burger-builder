@@ -21,15 +21,16 @@ class BurgerBuilder extends Component {
     }
 
     purchaseHandler = () => {
-        this.setState({
-            purchasing: true,
-        });
+        if (this.props.isAuth) {
+            this.setState({ purchasing: true, });
+        } else {
+            this.props.setAuthRedirectPath('/checkout');
+            this.props.history.push('/auth');
+        }
     }
 
     purchaseCancelHandler = () => {
-        this.setState({
-            purchasing: false,
-        });
+        this.setState({ purchasing: false, });
     }
 
     purchaseContinueHandler = () => {
@@ -62,6 +63,7 @@ class BurgerBuilder extends Component {
                         price={this.props.totalPrice}
                         purchasable={this.isPurchasable(this.props.ings)}
                         ordered={this.purchaseHandler}
+                        isAuth={this.props.isAuth}
                     />
                 </React.Fragment>
             );
@@ -89,6 +91,7 @@ const mapStateToProps = state => ({
     ings: state.burgerBuilder.ingredients,
     totalPrice: state.burgerBuilder.totalPrice,
     error: state.burgerBuilder.error,
+    isAuth: !!state.auth.token,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -96,6 +99,7 @@ const mapDispatchToProps = dispatch => ({
     onIngredientRemoved: (ingredientName) => dispatch(actions.removeIngredient(ingredientName)),
     initIngredients: () => dispatch(actions.initIngredients()),
     initPurchase: () => dispatch(actions.purchaseInit()),
+    setAuthRedirectPath: (path) => dispatch(actions.setAuthRedirectPath(path)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(BurgerBuilder, axios));
