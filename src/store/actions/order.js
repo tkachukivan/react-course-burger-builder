@@ -20,6 +20,8 @@ export const purchaseBurger = orderData => (dispatch, getState) => {
     dispatch(purchaseBurgerStart());
     const state = getState();
     orderData.userId = state.auth.userId;
+    orderData.ingredients = state.burgerBuilder.ingredients;
+    orderData.price = state.burgerBuilder.totalPrice;
 
     axios.post('/orders.json', orderData, { params: { auth: state.auth.token }})
         .then(response => {
